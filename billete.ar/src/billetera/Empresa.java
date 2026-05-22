@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class Empresa {
 
-    //datos
+    
     private String cuit;
     private String nombreFantasia;
     private String telefono;
@@ -14,11 +14,7 @@ public class Empresa {
     private Set<String> dniAutorizados;
 
     //constructor
-    public Empresa(String cuit,
-                   String nombreFantasia,
-                   String telefono,
-                   String email,
-                   String nombreContacto) {
+    public Empresa(String cuit,String nombreFantasia,String telefono,String email,String nombreContacto) {
 
         this.cuit = cuit;
         this.nombreFantasia = nombreFantasia;
@@ -26,6 +22,17 @@ public class Empresa {
         this.email = email;
         this.nombreContacto = nombreContacto;
 
-        this.dniAutorizados = new HashSet<>();
+        this.dniAutorizados = new HashSet<>(); //inicializamos el Conjunto de DNI
     }
+    
+    public void agregarAutorizado(String dni) {
+        dniAutorizados.add(dni);
+    }
+
+    public boolean estaAutorizado(String dni) {
+        return dniAutorizados.contains(dni);
+    }
+    
+    
+    
 }

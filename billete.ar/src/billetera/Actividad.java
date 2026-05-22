@@ -2,7 +2,7 @@ package billetera;
 
 import java.time.LocalDate;
 
-public class Actividad {
+public abstract class  Actividad {
 	protected LocalDate fechaConstitucion;
 	protected double monto;
 	protected int plazoDias;

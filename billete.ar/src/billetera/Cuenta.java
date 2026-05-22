@@ -5,10 +5,10 @@ import java.util.List;
 
 public abstract class Cuenta {
 
-	private String cvu;
-	private String alias;
+	protected String cvu;
+	protected String alias;
 	protected double saldo;
-	private Usuario titular;
+	protected Usuario titular;
 	protected List<Actividad> actividades;
 	
 	  //constructor
@@ -16,7 +16,11 @@ public abstract class Cuenta {
         this.cvu = cvu;
         this.alias = alias;
         this.titular = titular;
+        
+        
         this.saldo = 0;
+        
+        
         this.actividades = new ArrayList<>();
     }
 	
