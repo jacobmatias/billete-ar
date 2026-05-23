@@ -2,6 +2,7 @@ package billetera;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -11,6 +12,16 @@ public class Billetera implements IBilletera {
 	private Map<String, Cuenta> cuentas; // lista de cuentas , clave = cvu y valor Cuenta
 	private Map<String, Empresa> empresas; //lista de empresas , clave = cuit y valor = empresa
 	private Map<String, String> alias; //diccionario , clave = alias , valor = cvu
+	private List<Actividad> historialGlobal;
+	
+	
+	public Billetera() {
+	    usuarios = new HashMap<>();
+	    cuentas = new HashMap<>();
+	    empresas = new HashMap<>();
+	    alias = new HashMap<>();
+	    historialGlobal = new ArrayList<>();
+	}
 	
 	@Override
 	public void registrarEmpresa(String cuit, String nombreFantasia, String telefono, String email,String nombreContacto) {
@@ -97,8 +108,33 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
-		// TODO Auto-generated method stub
+		if(!cuentas.containsKey(cvuOrigen))
+	        throw new IllegalArgumentException("Cuenta origen inexistente");
 
+	    if(!cuentas.containsKey(cvuDestino))
+	        throw new IllegalArgumentException("Cuenta destino inexistente");
+
+	    Cuenta origen = cuentas.get(cvuOrigen);
+	    Cuenta destino = cuentas.get(cvuDestino);
+
+	    boolean aprobada = false;
+
+	    if(origen.getSaldo() >= monto){
+
+	        origen.debitar(monto);
+	        destino.acreditar(monto);
+
+	        aprobada = true;
+
+	        origen.sumarVolumen(monto);
+	        destino.sumarVolumen(monto);
+	    }
+
+	    Transferencia t = new Transferencia(monto,origen,destino,aprobada);
+	    origen.agregarActividad(t);
+	    destino.agregarActividad(t);
+
+	    historialGlobal.add(t);
 	}
 
 	@Override
@@ -134,20 +170,43 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> consultarHistorialGlobal() {
-		// TODO Auto-generated method stub
-		return null;
+		List<String> resultado = new ArrayList<>();
+
+	    for(Actividad a : historialGlobal){
+	        resultado.add(a.describir());
+	    }
+
+	    return resultado;
 	}
 
 	@Override
 	public List<String> consultarHistorialCuenta(String cvu) {
-		// TODO Auto-generated method stub
-		return null;
+		if(!cuentas.containsKey(cvu))
+	        throw new IllegalArgumentException();
+
+	    List<String> resultado = new ArrayList<>();
+
+	    Cuenta cuenta = cuentas.get(cvu);
+
+	    for(Actividad a : cuenta.getActividades()){
+	        resultado.add(a.describir());
+	    }
+
+	    return resultado;
 	}
 
 	@Override
 	public List<String> consultarHistorialUsuario(String dniUsuario) {
-		// TODO Auto-generated method stub
-		return null;
+		if(!usuarios.containsKey(dniUsuario))
+	        throw new IllegalArgumentException("Usuario inexistente");
+	    Usuario usuario =usuarios.get(dniUsuario);
+	    List<String> historial = new ArrayList<>();
+	    for(Cuenta cuenta :usuario.obtenerCuentas()) {
+	        for(Actividad actividad :cuenta.getActividades()) {
+	            historial.add(actividad.describir());
+	        }
+	    }
+	    return historial;
 	}
 
 	@Override
@@ -158,8 +217,14 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> cuentasConMayorVolumen(int cantidadTop) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Cuenta> lista = new ArrayList<>(cuentas.values());
+	    lista.sort((a,b)->Double.compare(b.getVolumenTransferido(),a.getVolumenTransferido()));
+	    List<String> resultado =
+	            new ArrayList<>();
+	    for(int i=0;i < cantidadTop && i < lista.size();i++){
+	        Cuenta c = lista.get(i);
+	        resultado.add(c.getAlias() + " (" + c.getCvu() + ")");}
+	    return resultado;
 	}
 
 }

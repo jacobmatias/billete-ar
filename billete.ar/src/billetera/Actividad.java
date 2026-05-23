@@ -12,4 +12,25 @@ public abstract class  Actividad {
 		this.monto = monto;
 		this.plazoDias = plazoDias;
 	}
+	
+	public double getplazoDias() {
+        return plazoDias;
+    }
+	public LocalDate getFechaConstitucion() {
+		return fechaConstitucion;
+	}
+	public double getMonto() {
+		return monto;
+	}
+	
+	public abstract String describir();
+	 
+	 @Override
+	    public String toString() {
+	        return "[" + fechaConstitucion + "] " +
+	               "[plazo: " + plazoDias + "] " +
+	               "[monto: " + monto + "] " +
+	               describir();
+	    }
+	
 }

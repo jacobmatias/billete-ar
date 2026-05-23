@@ -45,4 +45,8 @@ public class Usuario {
 		this.totalInvertido = totalInvertido - monto;
 	}
 
+	public String getDni() {
+		return dni;
+	}
+
 }
