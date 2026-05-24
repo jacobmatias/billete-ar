@@ -1,6 +1,6 @@
 package billetera;
 
-public abstract class RentaFija extends Inversion {
+public class RentaFija extends Inversion {
     
     private double tasaInteres;
 
@@ -9,4 +9,10 @@ public abstract class RentaFija extends Inversion {
         this.tasaInteres = tasaInteres;
     }
 
+    @Override
+    public double calcularInversion() {
+        long dias = getDiasTranscurridos();
+        double interes = monto * (tasaInteres / 365.0) * dias;
+        return monto + interes;
+    }
 }

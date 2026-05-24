@@ -13,6 +13,7 @@ public class Billetera implements IBilletera {
 	private Map<String, Empresa> empresas; //lista de empresas , clave = cuit y valor = empresa
 	private Map<String, String> alias; //diccionario , clave = alias , valor = cvu
 	private List<Actividad> historialGlobal;
+	private Map<Integer, Inversion> inversiones;
 	
 	
 	public Billetera() {
@@ -21,6 +22,7 @@ public class Billetera implements IBilletera {
 	    empresas = new HashMap<>();
 	    alias = new HashMap<>();
 	    historialGlobal = new ArrayList<>();
+	    inversiones = new HashMap<>();
 	}
 	
 	@Override
@@ -102,8 +104,9 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public double obtenerSaldoDisponible(String cvu) {
-		// TODO Auto-generated method stub
-		return 0;
+		Cuenta cuenta = cuentas.get(cvu);
+		if (cuenta == null) throw new RuntimeException("Cuenta inexistente");
+		return cuenta.obtenerSaldo();
 	}
 
 	@Override
@@ -139,27 +142,62 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
-		// TODO Auto-generated method stub
-		return 0;
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
+		if (usuario == null || cuenta == null) throw new RuntimeException("Usuario o cuenta inexistente");
+		
+		cuenta.debitar(monto);
+		double tasa = 0.20; 
+		Inversion inversion = new RentaFija(monto, plazoDias, tasa);
+		inversiones.put(inversion.getId(), inversion);
+		usuario.aumentarInvertido(monto);
+		
+		return inversion.getId();
 	}
 
 	@Override
 	public int realizarInversionDivisa(String dni, String cvu, double monto, int plazoDias, String divisa,
 			double tasa) {
-		// TODO Auto-generated method stub
-		return 0;
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
+		if (usuario == null || cuenta == null) throw new RuntimeException("Usuario o cuenta inexistente");
+		
+		cuenta.debitar(monto);
+		Inversion inversion = new VinculadaADivisa(monto, plazoDias, divisa, tasa);
+		inversiones.put(inversion.getId(), inversion);
+		usuario.aumentarInvertido(monto);
+		
+		return inversion.getId();
 	}
 
 	@Override
 	public int realizarInversionLiquidez(String dni, String cvu, double monto, int plazoDias) {
-		// TODO Auto-generated method stub
-		return 0;
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
+		if (usuario == null || cuenta == null) throw new RuntimeException("Usuario o cuenta inexistente");
+		
+		if (!(cuenta instanceof CuentaCorporativa)) {
+			throw new IllegalArgumentException("El fondo de liquidez requiere una cuenta corporativa");
+		}
+		
+		cuenta.debitar(monto);
+		Inversion inversion = new FondoLiquidez(monto, plazoDias);
+		inversiones.put(inversion.getId(), inversion);
+		usuario.aumentarInvertido(monto);
+		
+		return inversion.getId();
 	}
 
 	@Override
 	public void precancelarInversion(String dni, String cvu, int idInversion) {
-		// TODO Auto-generated method stub
-
+		Usuario usuario = usuarios.get(dni);
+		Cuenta cuenta = cuentas.get(cvu);
+		Inversion inversion = inversiones.get(idInversion);
+		if (usuario == null || cuenta == null || inversion == null) throw new RuntimeException("Datos inexistentes");
+		
+		double montoDevuelto = inversion.precancelar();
+		cuenta.acreditar(montoDevuelto);
+		usuario.disminuirInvertido(inversion.getMonto());
 	}
 
 	@Override
@@ -211,8 +249,9 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public double obtenerTotalInvertido(String dniUsuario) {
-		// TODO Auto-generated method stub
-		return 0;
+		Usuario usuario = usuarios.get(dniUsuario);
+		if (usuario == null) throw new RuntimeException("Usuario inexistente");
+		return usuario.obtenerTotalInvertido();
 	}
 
 	@Override

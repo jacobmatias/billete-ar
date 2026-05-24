@@ -3,19 +3,16 @@ package billetera;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-public abstract class Inversion extends Actividad{
+public abstract class Inversion extends Actividad {
     
     private static int contadorId = 1;
     protected int id;
-    protected int plazoDias;
     protected boolean activa;
     protected boolean precancelada;
-	private LocalDate fechaConstitucion;
     
     public Inversion(double monto, int plazoDias) {
     	super(monto, plazoDias);
         this.id = contadorId++; 
-        this.plazoDias = plazoDias;
         this.activa = true;
         this.precancelada = false;
     }
@@ -24,7 +21,7 @@ public abstract class Inversion extends Actividad{
         return id;
     }
 
-    public double getmonto() {
+    public double getMonto() {
         return monto;
     }
 
@@ -44,4 +41,39 @@ public abstract class Inversion extends Actividad{
         return plazoDias;
     }
 
+    protected long getDiasTranscurridos() {
+        long dias = ChronoUnit.DAYS.between(this.fechaConstitucion, Utilitarios.hoy());
+        if (dias > plazoDias) {
+            return plazoDias;
+        }
+        return dias;
+    }
+
+    public abstract double calcularInversion();
+    
+    public double precancelar() {
+        if (!activa) {
+            throw new RuntimeException("La inversión ya no está activa.");
+        }
+        this.activa = false;
+        this.precancelada = true;
+        
+        double resultadoActual = calcularInversion();
+        double rentabilidad = resultadoActual - monto;
+        
+        return monto + (rentabilidad / 2);
+    }
+    
+    public double finalizar() {
+        if (!activa) {
+            throw new RuntimeException("La inversión ya no está activa.");
+        }
+        this.activa = false;
+        return calcularInversion();
+    }
+    
+    @Override
+    public String describir() {
+        return "desc: " + this.getClass().getSimpleName() + "\nmonto: " + monto + "\nplazo: " + plazoDias;
+    }
 }
