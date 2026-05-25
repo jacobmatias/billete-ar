@@ -10,4 +10,9 @@ public class CuentaPremium extends Cuenta {
         super(cvu, alias, titular);
         this.saldo = saldoInicial;
     }
+    
+    @Override
+    public String toString() {
+        return "Premium: " + getAlias() + ", CVU: " + getCvu();
+    }
 }

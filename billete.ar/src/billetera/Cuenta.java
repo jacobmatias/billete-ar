@@ -11,12 +11,13 @@ public abstract class Cuenta {
 	protected Usuario titular;
 	protected List<Actividad> actividades;
 	protected double volumenTransferido;
+	private int volumen;
 	
 	  //constructor
     public Cuenta(String cvu, String alias, Usuario titular) {
         this.cvu = cvu;
         this.alias = alias;
-        this.titular = titular;
+        this.titular =	 titular;
         this.volumenTransferido = 0; 
         this.saldo = 0;
         this.actividades = new ArrayList<>();

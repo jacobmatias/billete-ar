@@ -7,4 +7,9 @@ public class CuentaRegular extends Cuenta {
     public CuentaRegular(String cvu, String alias, Usuario titular) {
         super(cvu, alias, titular);
     }
+    
+    @Override
+    public String toString() {
+        return "Regular: " + getAlias() + ", CVU: " + getCvu();
+    }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 
 public class Billetera implements IBilletera {
@@ -11,7 +12,7 @@ public class Billetera implements IBilletera {
 	private Map<String, Usuario> usuarios; //clave = dni , valor = usuario
 	private Map<String, Cuenta> cuentas; // lista de cuentas , clave = cvu y valor Cuenta
 	private Map<String, Empresa> empresas; //lista de empresas , clave = cuit y valor = empresa
-	private Map<String, String> alias; //diccionario , clave = alias , valor = cvu
+	private Map<String, String> aliasCVUs; //diccionario , clave = alias , valor = cvu
 	private List<Actividad> historialGlobal;
 	private Map<Integer, Inversion> inversiones;
 	
@@ -20,7 +21,7 @@ public class Billetera implements IBilletera {
 	    usuarios = new HashMap<>();
 	    cuentas = new HashMap<>();
 	    empresas = new HashMap<>();
-	    alias = new HashMap<>();
+	    aliasCVUs = new HashMap<>();
 	    historialGlobal = new ArrayList<>();
 	    inversiones = new HashMap<>();
 	}
@@ -80,37 +81,151 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String crearCuentaRegular(String dniUsuario, String alias) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		//verificamos que el usuario exista
+		if(!usuarios.containsKey(dniUsuario)) throw new IllegalArgumentException("El usuario no existe!");
+		
+		//verificamos que el alias ya no exista
+		if(aliasCVUs.containsKey(alias)) throw new IllegalArgumentException("El alias ya existe!");
+		
+		//generamos el siguiente CVU
+		String cvu = Utilitarios.generarSiguienteCvu();
+		
+		//capturamos el usuario
+		Usuario user = usuarios.get(dniUsuario);
+		
+		//creamos la cuenta
+		CuentaRegular nuevaCuenta = new CuentaRegular(cvu, alias, user);
+		
+		//agregamos la cuenta creada
+		cuentas.put(cvu, nuevaCuenta);
+		
+		//agregamos el alias creado
+		aliasCVUs.put(alias, cvu);
+		
+		//asociamos la cuenta al usuario
+		user.agregarCuenta(nuevaCuenta);
+		
+		
+		//retornamos el cvu creado
+		return cvu;
 	}
 
 	@Override
 	public String crearCuentaPremium(String dniUsuario, String alias, double depositoInicial) {
-		// TODO Auto-generated method stub
-		return null;
+		//verificamos que el usuario exista
+				if(!usuarios.containsKey(dniUsuario)) throw new IllegalArgumentException("El usuario no existe!");
+				
+				//verificamos que el alias ya no exista
+				if(aliasCVUs.containsKey(alias)) throw new IllegalArgumentException("El alias ya existe!");
+				
+				if(depositoInicial < 500000.00) throw new IllegalArgumentException("El monto es menor al permitido inicialmente, deben ser $500.000");
+				
+				//generamos el siguiente CVU
+				String cvu = Utilitarios.generarSiguienteCvu();
+				
+				//capturamos el usuario
+				Usuario user = usuarios.get(dniUsuario);
+				
+				//creamos la cuenta
+				CuentaPremium nuevaCuenta = new CuentaPremium(cvu,alias,user,depositoInicial);
+				
+				//agregamos la cuenta creada
+				cuentas.put(cvu, nuevaCuenta);
+				
+				//agregamos el alias creado
+				aliasCVUs.put(alias, cvu);
+				
+				//asociamos la cuenta al usuario
+				user.agregarCuenta(nuevaCuenta);
+				
+				
+				//retornamos el cvu creado
+				return cvu;
 	}
 
 	@Override
 	public String crearCuentaCorporativa(String dniUsuario, String alias, String cuitEmpresa) {
-		// TODO Auto-generated method stub
-		return null;
+		//verificamos que el usuario exista
+		if(!usuarios.containsKey(dniUsuario)) throw new IllegalArgumentException("El usuario no existe!");
+		
+		//verificamos que el alias ya no exista
+		if(aliasCVUs.containsKey(alias)) throw new IllegalArgumentException("El alias ya existe!");
+		
+		//verificamos que exista la empresa
+		if(!empresas.containsKey(cuitEmpresa))  throw new IllegalArgumentException("La empresa no existe!");
+		
+		
+		
+		//capturamos la empresa
+		
+		Empresa empresa = empresas.get(cuitEmpresa);
+		
+		   // verificamos autorizado
+	    if(!empresa.estaAutorizado(dniUsuario))
+	        throw new IllegalArgumentException("Usuario no autorizado");
+	    
+	    // generamos cvu
+	    String cvu = Utilitarios.generarSiguienteCvu();
+	    
+
+	    // obtenemos usuario
+	    Usuario user = usuarios.get(dniUsuario);
+	    
+	    // creamos cuenta
+	    CuentaCorporativa nuevaCuenta =
+	        new CuentaCorporativa(cvu, alias, user, empresa);
+
+	    // guardamos cuenta
+	    cuentas.put(cvu, nuevaCuenta);
+
+	    // guardamos alias
+	    aliasCVUs.put(alias, cvu);
+
+	    // asociamos usuario
+	    user.agregarCuenta(nuevaCuenta);
+
+	    // retornamos cvu
+	    return cvu;
 	}
 
 	@Override
 	public List<String> obtenerCuentas(String dniUsuario) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(!usuarios.containsKey(dniUsuario)) throw new IllegalArgumentException("Usuario no registrado");
+		
+		Usuario user = usuarios.get(dniUsuario);
+		
+
+	    List<String> resultado = new ArrayList<>();
+
+	    Iterator<Cuenta> it = user.obtenerCuentas().iterator();
+
+	    while(it.hasNext()) {
+	    	//polimorfismo!!
+	        Cuenta cuenta = it.next();
+
+	        resultado.add(cuenta.toString());
+	    }
+
+	    return resultado;
+		
+		
+		
 	}
 
 	@Override
 	public double obtenerSaldoDisponible(String cvu) {
 		Cuenta cuenta = cuentas.get(cvu);
-		if (cuenta == null) throw new RuntimeException("Cuenta inexistente");
+		if (cuenta == null) throw new IllegalArgumentException("Cuenta inexistente");
 		return cuenta.obtenerSaldo();
 	}
 
 	@Override
 	public void realizarTransferencia(String cvuOrigen, String cvuDestino, double monto) {
+		
+		//verificamos que las cuentas existan
+		
 		if(!cuentas.containsKey(cvuOrigen))
 	        throw new IllegalArgumentException("Cuenta origen inexistente");
 
@@ -120,10 +235,20 @@ public class Billetera implements IBilletera {
 	    Cuenta origen = cuentas.get(cvuOrigen);
 	    Cuenta destino = cuentas.get(cvuDestino);
 
+	    
 	    boolean aprobada = false;
+	    //verificamos que si es cuenta regular no supere lo maximo permitido
+	    
+	    if(destino instanceof CuentaRegular &&
+	    		   destino.getSaldo() + monto > 5000000) {
 
+	    		    throw new IllegalStateException(
+	    		        "La cuenta regular supera el limite permitido");
+	    		}
+	    //
 	    if(origen.getSaldo() >= monto){
-
+	    	
+	    	
 	        origen.debitar(monto);
 	        destino.acreditar(monto);
 
@@ -142,17 +267,27 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public int realizarInversionRentaFija(String dni, String cvu, double monto, int plazoDias) {
-		Usuario usuario = usuarios.get(dni);
-		Cuenta cuenta = cuentas.get(cvu);
-		if (usuario == null || cuenta == null) throw new RuntimeException("Usuario o cuenta inexistente");
-		
-		cuenta.debitar(monto);
-		double tasa = 0.20; 
-		Inversion inversion = new RentaFija(monto, plazoDias, tasa);
-		inversiones.put(inversion.getId(), inversion);
-		usuario.aumentarInvertido(monto);
-		
-		return inversion.getId();
+
+	    Usuario usuario = usuarios.get(dni);
+	    Cuenta cuenta = cuentas.get(cvu);
+
+	    if (usuario == null || cuenta == null)
+	        throw new RuntimeException("Usuario o cuenta inexistente");
+
+	    cuenta.debitar(monto);
+
+	    // sumamos una actividad al volumen
+	    cuenta.sumarVolumen(monto);
+
+	    double tasa = 0.20;
+
+	    Inversion inversion = new RentaFija(monto, plazoDias, tasa);
+
+	    inversiones.put(inversion.getId(), inversion);
+
+	    usuario.aumentarInvertido(monto);
+
+	    return inversion.getId();
 	}
 
 	@Override
@@ -193,7 +328,7 @@ public class Billetera implements IBilletera {
 		Usuario usuario = usuarios.get(dni);
 		Cuenta cuenta = cuentas.get(cvu);
 		Inversion inversion = inversiones.get(idInversion);
-		if (usuario == null || cuenta == null || inversion == null) throw new RuntimeException("Datos inexistentes");
+		if (usuario == null || cuenta == null || inversion == null) throw new IllegalArgumentException("Datos inexistentes");
 		
 		double montoDevuelto = inversion.precancelar();
 		cuenta.acreditar(montoDevuelto);
@@ -202,8 +337,10 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public String consultarCvu(String alias) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(!aliasCVUs.containsKey(alias)) throw new IllegalArgumentException("No existe el alias solcitiado");
+		
+		return aliasCVUs.get(alias);
 	}
 
 	@Override
@@ -256,14 +393,50 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> cuentasConMayorVolumen(int cantidadTop) {
-		List<Cuenta> lista = new ArrayList<>(cuentas.values());
-	    lista.sort((a,b)->Double.compare(b.getVolumenTransferido(),a.getVolumenTransferido()));
-	    List<String> resultado =
-	            new ArrayList<>();
-	    for(int i=0;i < cantidadTop && i < lista.size();i++){
-	        Cuenta c = lista.get(i);
-	        resultado.add(c.getAlias() + " (" + c.getCvu() + ")");}
+
+	    // verificamos que el top pedido sea valido
+	    if(cantidadTop <= 0)
+	        throw new IllegalArgumentException("La cantidad debe ser positiva");
+
+	    // convertimos todas las cuentas del Map a una lista
+	    // porque las listas se pueden ordenar
+	    List<Cuenta> lista = new ArrayList<>(cuentas.values());
+
+	    // ordenamos las cuentas de MAYOR volumen a MENOR volumen
+	    lista.sort((a,b) -> Double.compare(b.getVolumenTransferido(), a.getVolumenTransferido()));
+
+	    // lista donde vamos a guardar el resultado final
+	    List<String> resultado = new ArrayList<>();
+
+	    // creamos el iterador para recorrer las cuentas
+	    Iterator<Cuenta> it = lista.iterator();
+
+	    // contador para limitar la cantidad del TOP
+	    int contador = 0;
+
+	    // recorremos mientras:
+	    // - haya elementos
+	    // - no superemos el top solicitado
+	    while(it.hasNext() && contador < cantidadTop) {
+
+	        // obtenemos la siguiente cuenta
+	        Cuenta cuenta = it.next();
+
+	        // agregamos el formato usando toString()
+	        resultado.add(cuenta.toString());
+
+	        // aumentamos contador
+	        contador++;
+	    }
+
+	    // devolvemos la lista final
 	    return resultado;
 	}
-
+	
+	@Override
+	public String toString() {
+	    return "Usuarios registrados: " + usuarios.size()
+	        + "\nCuentas registradas: " + cuentas.size()
+	        + "\nEmpresas registradas: " + empresas.size();
+	}	
 }

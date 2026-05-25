@@ -10,4 +10,9 @@ public class CuentaCorporativa extends Cuenta {
         super(cvu, alias, titular);
         this.empresa = empresa;
     }
+    
+    @Override
+    public String toString() {
+        return "Corporativa: " + getAlias() + ", CVU: " + getCvu();
+    }
 }

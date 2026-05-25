@@ -6,7 +6,7 @@ public class Transferencia extends Actividad{
     private Cuenta cuentaDestino;
     private boolean aprobada;
 
-	public Transferencia(double monto, Cuenta cuentaDestino, Cuenta cuentaOrigen,boolean aprobada) {
+	public Transferencia(double monto, Cuenta cuentaOrigen, Cuenta cuentaDestino,boolean aprobada) {
 		super(monto,0);
 		this.cuentaOrigen  = cuentaOrigen;
         this.cuentaDestino = cuentaDestino;

@@ -48,5 +48,9 @@ public class Usuario {
 	public String getDni() {
 		return dni;
 	}
-
+	
+	@Override
+	public String toString() {
+	    return nombre + " ,DNI = " + dni;
+	}
 }
