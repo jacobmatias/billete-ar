@@ -10,6 +10,13 @@ public class CuentaRegular extends Cuenta {
     
     @Override
     public String toString() {
-        return "Regular: " + getAlias() + ", CVU: " + getCvu();
+    	StringBuilder sb = new StringBuilder();
+    	
+    	sb.append("Regular: ")
+    	  .append(getAlias())
+    	  .append(", CVU: ")
+    	  .append(getCvu());
+        
+    	return sb.toString();
     }
 }

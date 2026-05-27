@@ -25,12 +25,22 @@ public abstract class  Actividad {
 	
 	public abstract String describir();
 	 
-	 @Override
-	    public String toString() {
-	        return "[" + fechaConstitucion + "] " +
-	               "[plazo: " + plazoDias + "] " +
-	               "[monto: " + monto + "] " +
-	               describir();
-	    }
+	public String toString() {
+
+	    StringBuilder sb = new StringBuilder();
+
+	    sb.append("[")
+	      .append(fechaConstitucion)
+	      .append("] ")
+	      .append("[plazo: ")
+	      .append(plazoDias)
+	      .append("] ")
+	      .append("[monto: ")
+	      .append(monto)
+	      .append("] ")
+	      .append(describir());
+
+	    return sb.toString();
+	}
 	
 }

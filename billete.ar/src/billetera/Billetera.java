@@ -372,13 +372,19 @@ public class Billetera implements IBilletera {
 
 	@Override
 	public List<String> consultarHistorialUsuario(String dniUsuario) {
+		
 		if(!usuarios.containsKey(dniUsuario))
 	        throw new IllegalArgumentException("Usuario inexistente");
-	    Usuario usuario =usuarios.get(dniUsuario);
-	    List<String> historial = new ArrayList<>();
-	    for(Cuenta cuenta :usuario.obtenerCuentas()) {
-	        for(Actividad actividad :cuenta.getActividades()) {
-	            historial.add(actividad.describir());
+	    
+		Usuario usuario =usuarios.get(dniUsuario);
+	    
+		List<String> historial = new ArrayList<>();
+	    
+		for(Cuenta cuenta :usuario.obtenerCuentas()) {
+	        
+			for(Actividad actividad :cuenta.getActividades()) {
+	           
+				historial.add(actividad.describir());
 	        }
 	    }
 	    return historial;
@@ -435,8 +441,16 @@ public class Billetera implements IBilletera {
 	
 	@Override
 	public String toString() {
-	    return "Usuarios registrados: " + usuarios.size()
-	        + "\nCuentas registradas: " + cuentas.size()
-	        + "\nEmpresas registradas: " + empresas.size();
+
+	    StringBuilder sb = new StringBuilder();
+
+	    sb.append("Usuarios registrados: ")
+	      .append(usuarios.size())
+	      .append("\nCuentas registradas: ")
+	      .append(cuentas.size())
+	      .append("\nEmpresas registradas: ")
+	      .append(empresas.size());
+
+	    return sb.toString();
 	}	
 }

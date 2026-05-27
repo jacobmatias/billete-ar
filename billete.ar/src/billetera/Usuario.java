@@ -51,6 +51,12 @@ public class Usuario {
 	
 	@Override
 	public String toString() {
-	    return nombre + " ,DNI = " + dni;
-	}
+		 StringBuilder sb = new StringBuilder();
+
+		    sb.append(nombre);
+		    sb.append(" ,DNI = ");
+		    sb.append(dni);
+
+		    return sb.toString();
+		}
 }

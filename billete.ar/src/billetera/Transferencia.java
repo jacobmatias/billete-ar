@@ -24,24 +24,39 @@ public class Transferencia extends Actividad{
 	public boolean isAprobada() {
 		return aprobada;
 	}
-	@Override
-    public String describir() {
-        String estado;
-        if(aprobada)
-            estado = "Aprobado";
-        else
-            estado = "Rechazado";
 
-        return "fecha: " + getFechaConstitucion()
-                + "\norigen: "
-                + cuentaOrigen.getTitular()
-                + " (" + cuentaOrigen.getCvu() + ")"
-                + "\ndestino: "
-                + cuentaDestino.getTitular()
-                + " (" + cuentaDestino.getCvu() + ")"
-                + "\nmonto: " + getMonto()
-                + "\n" + estado;
-    }
+	@Override
+
+	public String describir() {
+
+	    String estado;
+
+	    if(aprobada)
+	        estado = "Aprobado";
+	    else
+	        estado = "Rechazado";
+
+	    StringBuilder sb = new StringBuilder();
+
+	    sb.append("fecha: ")
+	      .append(getFechaConstitucion())
+	      .append("\norigen: ")
+	      .append(cuentaOrigen.getTitular())
+	      .append(" (")
+	      .append(cuentaOrigen.getCvu())
+	      .append(")")
+	      .append("\ndestino: ")
+	      .append(cuentaDestino.getTitular())
+	      .append(" (")
+	      .append(cuentaDestino.getCvu())
+	      .append(")")
+	      .append("\nmonto: ")
+	      .append(getMonto())
+	      .append("\n")
+	      .append(estado);
+
+	    return sb.toString();
+	}
 
 	
 

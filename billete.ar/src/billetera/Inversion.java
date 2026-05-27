@@ -74,6 +74,18 @@ public abstract class Inversion extends Actividad {
     
     @Override
     public String describir() {
-        return "desc: " + this.getClass().getSimpleName() + "\nmonto: " + monto + "\nplazo: " + plazoDias;
+      //  return "desc: " + this.getClass().getSimpleName() + "\nmonto: " + monto + "\nplazo: " + plazoDias;
+        
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("desc: ")
+          .append(this.getClass().getSimpleName())
+          .append("\nmonto: ")
+          .append(monto)
+          .append("\nplazo: ")
+          .append(plazoDias);
+        
+        return sb.toString();
+        
     }
 }

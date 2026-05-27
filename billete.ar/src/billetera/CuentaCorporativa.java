@@ -13,6 +13,17 @@ public class CuentaCorporativa extends Cuenta {
     
     @Override
     public String toString() {
-        return "Corporativa: " + getAlias() + ", CVU: " + getCvu();
+    	
+    	StringBuilder sb = new StringBuilder();
+    	
+    	sb.append("Corporativa: " )
+    	  .append(getAlias())
+    	  .append(", CVU: ")
+    	  .append(getCvu());
+        
+    	return sb.toString();
+    	
+    	
+        
     }
 }

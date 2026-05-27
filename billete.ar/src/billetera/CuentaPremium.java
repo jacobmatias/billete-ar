@@ -13,6 +13,15 @@ public class CuentaPremium extends Cuenta {
     
     @Override
     public String toString() {
-        return "Premium: " + getAlias() + ", CVU: " + getCvu();
+    	
+    	StringBuilder sb = new StringBuilder();
+    	
+    	sb.append("Premium: " )
+    	  .append(getAlias())
+    	  .append(", CVU: ")
+    	  .append(getCvu());
+        
+    	return sb.toString();
+    	
     }
 }
