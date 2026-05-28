@@ -13,6 +13,19 @@ public class Usuario {
 	
 	
 	//constructor
+	public Usuario(String dni,String nombre) {
+		this.dni=dni;
+		this.nombre=nombre;
+		this.telefono= "No corresponde";
+		this.email= "No corresponde";
+		
+		this.totalInvertido= 0; //todos arrancan en cero por defecto
+		
+		this.cuentas = new ArrayList<>(); //inicializamos la lista de cuentas para evitar el null point exception
+	}
+	
+	
+	//constructor
 	public Usuario(String dni,String nombre,String telefono,String email) {
 		this.dni=dni;
 		this.nombre=nombre;
