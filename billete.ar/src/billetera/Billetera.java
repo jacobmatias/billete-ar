@@ -286,6 +286,9 @@ public class Billetera implements IBilletera {
 	    inversiones.put(inversion.getId(), inversion);
 
 	    usuario.aumentarInvertido(monto);
+	    
+	    cuenta.agregarActividad(inversion);
+	    historialGlobal.add(inversion);
 
 	    return inversion.getId();
 	}
@@ -298,9 +301,16 @@ public class Billetera implements IBilletera {
 		if (usuario == null || cuenta == null) throw new RuntimeException("Usuario o cuenta inexistente");
 		
 		cuenta.debitar(monto);
+		
+		cuenta.sumarVolumen(monto);
+
+		
 		Inversion inversion = new VinculadaADivisa(monto, plazoDias, divisa, tasa);
 		inversiones.put(inversion.getId(), inversion);
 		usuario.aumentarInvertido(monto);
+		
+		 cuenta.agregarActividad(inversion);
+		 historialGlobal.add(inversion);
 		
 		return inversion.getId();
 	}
@@ -316,9 +326,16 @@ public class Billetera implements IBilletera {
 		}
 		
 		cuenta.debitar(monto);
+		
+		cuenta.sumarVolumen(monto);
+
+		
 		Inversion inversion = new FondoLiquidez(monto, plazoDias);
 		inversiones.put(inversion.getId(), inversion);
 		usuario.aumentarInvertido(monto);
+		
+		cuenta.agregarActividad(inversion);
+		historialGlobal.add(inversion);
 		
 		return inversion.getId();
 	}
